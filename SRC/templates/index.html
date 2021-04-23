@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/css/style.css">
     <script src="https://kit.fontawesome.com/ddc78c29ff.js" crossorigin="anonymous"></script>
+    <script src="../static/js/main.js" defer></script>
     <title>Customer Care Registry</title>
 </head>
 <body>
@@ -21,7 +22,7 @@
                     <path d="M18,11.03C17.52,8.18,15.04,6,12.05,6c-3.03,0-6.29,2.51-6.03,6.45c2.47-1.01,4.33-3.21,4.86-5.89 C12.19,9.19,14.88,11,18,11.03z"/>
                     </g></g>
                 </svg>
-                <h1>Customer Care Registry</h1>
+                <h1 id="logo_heading">Customer Care Registry</h1>
             </div>
             <div class="left_invisible">
                 <h1>Welcome Back!</h1>
@@ -29,18 +30,29 @@
                     <p>To keep connected with us please</p>
                     <p>login with your personal info</p>
                 </span>
-                <button>Sign in</button>
+                <button id="signin">Sign in</button>
             </div>
-        </div>
-        <div class="right">
-            <div>
-                <div class="signup">
-                    <h1>Create Account</h1>
-                    <form method="POST" action="#">
+            <div class="signin">
+                <div >
+                    <div class="msg">
+                        <p>Your registration successfully completed.</p>
+                    </div>
+                    <h1>Login in to Your Account</h1>
+                    <div class="auth">
                         <div>
-                            <i class="fas fa-user"></i>
-                            <input type="text" name="uname" placeholder="Name" required>
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        </div>  
+                        <div>
+                            <a href="#"><i class="fab fa-google"></i></a>
+                        </div>                      
+                        <div>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
                         </div>
+                    </div>
+                    <div class="other_option">
+                        <p>Or use your email for login</p>
+                    </div>
+                    <form method="POST" action="#">
                         <div>
                             <i class="fas fa-envelope"></i>
                             <input type="text" name="mail" placeholder="Email" required>
@@ -49,28 +61,65 @@
                             <i class="fas fa-lock"></i>
                             <input type="password" name="pwd" placeholder="Password" required>
                         </div>
-                        <input type="submit" value="Sign Up">
+                        <div id="fgpwd">
+                            <a href="#">Forget Password?</a>
+                        </div>
+                        <input type="submit" value="Sign In">
                     </form>
                 </div>
             </div>
         </div>
+        <div class="right">
+            <div>
+                <div class="signup">
+                    <div class="msg">
+                        <p>{{signupmsg}}</p>
+                    </div>
+                    <h1>Create Account</h1>
+                    <div class="auth">
+                        <div>
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        </div>  
+                        <div>
+                            <a href="#"><i class="fab fa-google"></i></a>
+                        </div>                      
+                        <div>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="other_option">
+                        <p>Or use your email for registration</p>
+                    </div>
+                    <form method="POST" action="/register">
+                        <div class="input_div">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="uname" class="inputs" placeholder="Name" required>
+                        </div>
+                        <div class="input_div">
+                            <i class="fas fa-envelope"></i>
+                            <input type="text" name="mail" class="inputs" placeholder="Email" required>
+                        </div>
+                        <div class="input_div">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="pwd" class="inputs" placeholder="Password" required>
+                        </div>
+                        <div class="input_div">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="confirmpwd" class="inputs" placeholder="Confirm Password" required>
+                        </div>
+                        <input type="submit" value="Sign Up">
+                    </form>
+                </div>
+            </div>
+            <div class="right_invisible">
+                <h1>Hello Friends!</h1>
+                <span>
+                    <p>Enter Your Personal details</p>
+                    <p>Your Problems we have solve.</p>
+                </span>
+                <button id="signup">Sign Up</button>
+            </div>
+        </div>
     </div>
-
-
-    <script>
-        let logo = document.getElementsByTagName('svg')[0];
-        logo.style.fill = "#ffffff";
-    </script>
 </body>
 </html>
-
-<!--
-                <div class="right_invisible">
-                    <h1>Hello Friends!</h1>
-                    <span>
-                        <p>Enter Your Personal details</p>
-                        <p>Your Problems we have solve.</p>
-                    </span>
-                    <button>Sign Up</button>
-                </div>
-            -->
