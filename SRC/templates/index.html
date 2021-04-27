@@ -35,7 +35,7 @@
             <div class="signin">
                 <div >
                     <div class="msg">
-                        <p>Your registration successfully completed.</p>
+                        <p>{{signinmsg}}</p>
                     </div>
                     <h1>Login in to Your Account</h1>
                     <div class="auth">
@@ -43,7 +43,7 @@
                             <a href="#"><i class="fab fa-facebook-f"></i></a>
                         </div>  
                         <div>
-                            <a href="#"><i class="fab fa-google"></i></a>
+                            <a href="/google_login"><i class="fab fa-google"></i></a>
                         </div>                      
                         <div>
                             <a href="#"><i class="fab fa-linkedin-in"></i></a>
@@ -52,14 +52,14 @@
                     <div class="other_option">
                         <p>Or use your email for login</p>
                     </div>
-                    <form method="POST" action="#">
+                    <form method="POST" action="/login">
                         <div>
                             <i class="fas fa-envelope"></i>
-                            <input type="text" name="mail" placeholder="Email" required>
+                            <input type="text" name="mail1" placeholder="Email" required>
                         </div>
                         <div>
                             <i class="fas fa-lock"></i>
-                            <input type="password" name="pwd" placeholder="Password" required>
+                            <input type="password" name="pwd1" placeholder="Password" required>
                         </div>
                         <div id="fgpwd">
                             <a href="#">Forget Password?</a>
@@ -77,11 +77,11 @@
                     </div>
                     <h1>Create Account</h1>
                     <div class="auth">
-                        <div>
+                        <div class="">
                             <a href="#"><i class="fab fa-facebook-f"></i></a>
                         </div>  
                         <div>
-                            <a href="#"><i class="fab fa-google"></i></a>
+                            <a href="/google_signup"><i class="fab fa-google"></i></a>
                         </div>                      
                         <div>
                             <a href="#"><i class="fab fa-linkedin-in"></i></a>
@@ -90,7 +90,7 @@
                     <div class="other_option">
                         <p>Or use your email for registration</p>
                     </div>
-                    <form method="POST" action="/register">
+                     <form method="POST" action="/register">
                         <div class="input_div">
                             <i class="fas fa-user"></i>
                             <input type="text" name="uname" class="inputs" placeholder="Name" required>
