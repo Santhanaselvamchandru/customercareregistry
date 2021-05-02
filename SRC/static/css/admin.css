@@ -1,0 +1,51 @@
+:root{
+    --bgColor : #1abc9c;
+    --fontColor : #fff;
+    --inputColor : #ecf0f1;
+}
+*{
+    margin : 0;
+    padding: 0;
+    box-sizing : border-box;
+    font-family : Roboto;
+}
+body{
+    font-family : Roboto;
+    background-color : var(--bgColor);
+}
+.header{
+    display : flex;
+    height : 80px;
+    box-shadow: 0 0 1px 1px rgba(250,250,250,1);
+    background-color : var(--fontColor);
+}
+.Tittle{
+    flex : 1;
+    display : flex;
+    align-items: center;
+    color : var(--bgColor);
+}
+.Tittle h1{
+    font-size : 1.5rem;
+}
+.urls{
+    display : flex;
+    align-items:center;
+    justify-content:center;
+}
+.urls div{
+    margin: 0 0.5rem 0 1rem;
+    font-size : 1.2rem;
+}
+.urls div a{
+    text-decoration : none;
+    color : var(--bgColor);
+}
+.urls div:last-child a{
+    padding : 1.2rem;
+    font-weight : bold;
+    font-size : 1.4rem;
+    background-color : var(--bgColor);
+    color : var(--fontColor);
+    border-radius : 50%;
+}

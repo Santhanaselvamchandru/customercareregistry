@@ -32,11 +32,7 @@
                 <a href="/showcomplaints">Complaints</a>
             </div>
             <div>
-                {% if logo %}
-                <img src={{logo.picture}}>
-                {% else %}
-                <img src="https://static.vecteezy.com/system/resources/thumbnails/000/550/731/small/user_icon_004.jpg">
-                {% endif %}
+                <img src="../static/images/user.png">
             </div>
         </div>
     </div>
@@ -50,14 +46,18 @@
                 <input type='text' name='complaint_name' placeholder="Complaint Name" required>
             </div>
             <div>
-                <input type='text' name='name' placeholder="Name" required>
+                <input type='text' name='name' id = "dis_name" value="{{ session['username'] }}" placeholder="Name" required>
             </div>
             <div>
-                <input type='text' name='email' placeholder="Email" required>
+                <input type='text' name='email' value="{{ session['mail'] }}" placeholder="Email" required>
+            </div>
+            <div>
+                <input type="text" name="date" value="{{ session['current_date'] }}" placeholder="Current Date" required>
             </div>
             <div>
                 <input type="text" name="against_person" placeholder="Name of the against company/person" required>
             </div>
+            
             <div>
                 <textarea id="complaint_des" name="complaint_des" placeholder="Description about complaint" required></textarea>
             </div>

@@ -18,7 +18,11 @@ from flask_mysqldb import MySQL
 from sendmail import sendemail
 from flask_oauthlib.client import OAuth
 import json
+import re
 from random import randint
+from datetime import date
+
+
 app = Flask(__name__)
 
 # database configuration
@@ -34,7 +38,7 @@ app.config['GOOGLE_SECRET'] = 'pYRs5szyt-Yv81ELQnxeRy6c'
 
 app.secret_key = "customercareregistry"
 
-oauth = OAuth(app)
+oauth = OAuth()
 # google client informations
 google = oauth.remote_app(
     'google',
@@ -43,19 +47,24 @@ google = oauth.remote_app(
     request_token_params = {
         'scope' : ['email','https://www.googleapis.com/auth/userinfo.profile'],
     },
-    base_url='https://www.googleapis.com/oauth2/v1/',
+    base_url='https://www.googleapis.com/oauth2/v2/',
     request_token_url=None,
     access_token_method='POST',
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
 )
 
+oauth.init_app(app)
 #home page
 @app.route('/')
 def home():
+    today = date.today()
+    current_date = today.strftime('%d/%m/%Y')
     if "google_token" in session:
+        session["current_date"] = current_date
         return render_template('home.html')
     if "username" in session:
+        session["current_date"] = current_date
         return render_template('home.html')
     return render_template('index.html')
 
@@ -64,15 +73,18 @@ def home():
 def register():
     if request.method == 'POST':
         name = request.form['uname']
-        email = request.form['mail']
+        mail = request.form['mail']
         pwd = request.form['pwd']
         cpwd = request.form['confirmpwd']
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', mail):
+            msg = 'Invalid email address !'
+            return render_template('index.html',signupmsg=msg)
         if pwd != cpwd:
             msg = 'Please enter correct confirm password'
             return render_template('index.html',signupmsg=msg)
         # check account is exists or not
         cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * customerdeatils WHERE email = % s',(email),)
+        cursor.execute('SELECT * FROM customerdeatils WHERE email LIKE % s',[mail])
         existing_user = cursor.fetchone()
         cursor.close()
         #exits 
@@ -81,17 +93,17 @@ def register():
             return render_template('index.html',signupmsg = msg)
         #not exists
         cursor = mysql.connection.cursor()
-        cursor.execute('INSERT INTO customerdeatils VALUES(null,% s,% s,% s)',(name,email,pwd))
+        cursor.execute('INSERT INTO customerdeatils VALUES(null,% s,% s,% s)',(name,mail,pwd))
         mysql.connection.commit()
         cursor.close()
         subject = 'Customer care registry account creation.'
         text = 'Account creation successfully.'
         # send mail
-        sendemail(email,subject,text)
+        sendemail(mail,subject,text)
         msg = 'Your registration successfully completed.'
     return render_template('index.html',signupmsg = msg)
 # manually login
-@app.route('/login',methods=['POST'])
+@app.route('/login',methods=['POST','GET'])
 def login():
     if request.method == 'POST':
         mail = request.form['mail1']
@@ -103,10 +115,14 @@ def login():
         cursor.close()
         #exists
         if user:
-            return render_template('home.html')
+            session["username"] = user[1]
+            session['mail'] = mail
+            return render_template('home.html',username=session["username"],mail=session["mail"])
         else:
             msg = 'mail or password is not valid.'
-    return render_template('index.html',signinmsg=msg)
+            return render_template('index.html',signinmsg=msg)
+    if request.method == "GET":
+        return redirect(url_for('home'))
 # google account through registration
 @app.route('/google_signup')
 def google_signup():
@@ -173,11 +189,12 @@ def google_login_authorized():
         if not existing_user:
             msg = "Account doesn't exist please register"
             return render_template('index.html',signinmsg = msg)
-        logo = {'picture' : ex_json['picture']}
-        return render_template('home.html',logo = logo)
+        session["username"] = name
+        session["mail"] = email
+        return redirect(url_for('home'))
     else:
         msg = "Invalid response from google please try again"
-        return render_template('index.html',signinmsg = msg)
+    return render_template('index.html',signinmsg = msg)
 
 @google.tokengetter
 def get_google_oauth_token():
@@ -190,6 +207,9 @@ def logout():
         session.pop("username")
     if "google_token" in session:
         session.pop("google_token")
+        session.pop("mail")
+    if "mail" in session:
+        session.pop("mail")
     return redirect(url_for('home'))
 
 # complaint register
@@ -200,9 +220,10 @@ def complaint():
         name = request.form['name']
         mail = request.form['email']
         against_person = request.form['against_person']
+        date = request.form["date"]
         des = request.form['complaint_des']
         cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO complaints VALUES(NULL,% s,% s,% s,% s,% s)",(complaint_name,name,mail,against_person,des))
+        cursor.execute("INSERT INTO complaints VALUES(NULL,% s,% s,% s,% s,% s,% s,% s)",(complaint_name,name,mail,against_person,des,date,'0'))
         mysql.connection.commit()
         cursor.close()
         msg = 'Complaint registerd you check out complaints section.'
@@ -211,12 +232,39 @@ def complaint():
 # show complaints and progress
 @app.route('/showcomplaints')
 def showcomplaints():
-    return render_template('complaints.html')
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM complaints WHERE username= % s",(session["username"],))
+    details = cursor.fetchall()
+    cursor.close()
+    return render_template('complaints.html',complaints=details)
+
+@app.route('/solve',methods=["POST"])
+def solve_complaint():
+    if request.method == "POST":
+        c_id = request.form['c_id']
+        cursor = mysql.connection.cursor()
+        cursor.execute("UPDATE complaints SET solved = % s WHERE id = % s",('1',c_id,))
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('showcomplaints'))
+    return redirect(url_for('showcomplaints'))
+
+@app.route('/dismiss',methods=["POST"])
+def dismiss_complaint():
+    if request.method == "POST":
+        c_id = request.form["c_id"]
+        cursor = mysql.connection.cursor()
+        cursor.execute("DELETE FROM complaints WHERE id = % s",[c_id])
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('showcomplaints'))
+    return redirect(url_for('showcomplaints'))
 
 # feedback
 @app.route('/feedback')
 def feedback():
     return render_template('feedback.html')
 
+
 if __name__ == '__main__':
-    app.run(port = 8080,debug=True)
+    app.run(host = '0.0.0.0',port = 8080,debug=True)

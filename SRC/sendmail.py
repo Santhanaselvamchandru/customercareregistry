@@ -9,6 +9,4 @@ def sendemail(user,subject,TEXT):
     mail = Mail(from_email,to_email,subject,content)
     mail_json = mail.get()
     response = api.client.mail.send.post(request_body=mail_json)
-    print(response.status_code)
-    print(response.headers)
     
