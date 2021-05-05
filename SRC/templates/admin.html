@@ -27,10 +27,10 @@
                 <a href="/logout">Log out</a>
             </div>
             <div>
-                <a href="">Complaints</a>
+                <a href="/admin/complaints">Complaints</a>
             </div>
             <div>
-                <a href="">Customers</a>
+                <a href="/admin/customers">Customers</a>
             </div>
             <div>
                 <a href="#">ADMIN</a>
@@ -38,11 +38,68 @@
         </div>
     </div>
     <div>
+        {% if customers %}
         <div class="customer_details">
             <div>
                 <h2>Customers</h2>
             </div>
         </div>
+        <table>
+            <thead>
+                <th>id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Delete</th>
+            </thead>
+            <tbody>
+                {% for c in customers %}
+                <tr>
+                    <td>{{c[0]}}</td>
+                    <td>{{c[1]}}</td>
+                    <td>{{c[2]}}</td>
+                    <td>{{c[3]}}</td>
+                    <td><a href="/Delete/customers/{{c[0]}}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if complaints %}
+        <div class="complaint_details">
+            <div>
+                <h2>Complaints</h2>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <th>id</th>
+                <th>complaint name</th>
+                <th>username</th>
+                <th>email</th>
+                <th>against name</th>
+                <th>Description</th>
+                <th>date</th>
+                <th>solved</th>
+                <th>Delete</th>
+            </thead>
+            <tbody>
+                {% for c in complaints %}
+                <tr>
+                    <td>{{c[0]}}</td>
+                    <td>{{c[1]}}</td>
+                    <td>{{c[2]}}</td>
+                    <td>{{c[3]}}</td>
+                    <td>{{c[4]}}</td>
+                    <td>{{c[5]}}</td>
+                    <td>{{c[6]}}</td>
+                    <td>{{c[7]}}</td>
+                    <td><a href="/Delete/complaints/{{c[0]}}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
 </body>
 </html>

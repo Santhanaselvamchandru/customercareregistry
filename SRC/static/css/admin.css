@@ -49,3 +49,49 @@ body{
     color : var(--fontColor);
     border-radius : 50%;
 }
+.customer_details{
+    margin : 0 auto;
+    display : flex;
+    align-items : center;
+    justify-content : center;
+}
+.customer_details h2,.complaint_details h2{
+    text-align : center;
+    color : var(--fontColor);
+    margin : 1rem;
+    font-size : 2.2rem;
+}
+table{
+    margin : 0 auto;
+    width : 83rem;
+    border-collapse : separate;
+    border-spacing : 0 0.1rem;
+    text-align : center;
+    margin-bottom : 2rem;
+}
+table thead th{
+    padding : 0.8rem;
+    font-size : 1.2rem;
+    text-transform : uppercase;
+    color : var(--bgColor);
+    background-color : var(--fontColor);
+}
+table tbody tr:nth-child(odd){
+    background-color : var(--inputColor);
+}
+table tbody tr:nth-child(even){
+    background-color : var(--fontColor);
+}
+table tbody tr td{
+    padding : 1rem 0;
+    color : #2d3436;
+    font-size : 1.2rem;
+}
+td a{
+    text-decoration : none;
+    color : #fff;
+    background-color : rgb(255,0,0);
+    padding : 0.7rem 0.9rem;
+    border-radius : 3px;
+    font-size : 0.9rem;
+}

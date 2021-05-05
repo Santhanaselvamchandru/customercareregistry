@@ -1,18 +1,3 @@
-"""
-    Database credentials
-    Username: a7tPSqJMm4
-
-    Database name: a7tPSqJMm4
-
-    Password: dZRSGZReBY
-
-    Server: remotemysql.com
-
-    Port: 3306
-
-    google client id - 230809809224-6dvmdva24gkp8dgku6bk114dm5gkoes1.apps.googleusercontent.com
-    client secret - pYRs5szyt-Yv81ELQnxeRy6c
-"""
 from flask import Flask,render_template,request,url_for,session,redirect
 from flask_mysqldb import MySQL
 from sendmail import sendemail
@@ -33,8 +18,8 @@ app.config['MYSQL_DB'] = 'a7tPSqJMm4'
 mysql = MySQL(app)
 
 # Google authenticate configuration
-app.config['GOOGLE_ID'] = '230809809224-6dvmdva24gkp8dgku6bk114dm5gkoes1.apps.googleusercontent.com'
-app.config['GOOGLE_SECRET'] = 'pYRs5szyt-Yv81ELQnxeRy6c'
+app.config['GOOGLE_ID'] = 'Your google id'
+app.config['GOOGLE_SECRET'] = 'Your Google Secret Key'
 
 app.secret_key = "customercareregistry"
 
@@ -102,12 +87,46 @@ def register():
         sendemail(mail,subject,text)
         msg = 'Your registration successfully completed.'
     return render_template('index.html',signupmsg = msg)
+# admin page
+@app.route('/admin/<which>')
+def admin(which):
+    if which == 'customers':
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM customerdeatils')
+        data = cursor.fetchall()
+        cursor.close()
+        print(data[0])
+        return render_template('admin.html',customers=data,complaints=None)
+    if which == 'complaints':
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM complaints')
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('admin.html',customers=None,complaints=data)
+# admin delete
+@app.route('/Delete/<type>/<id>')
+def Delete(type,id):
+    if type == 'customers':
+        cursor = mysql.connection.cursor()
+        cursor.execute('DELETE FROM customerdeatils WHERE id = % s',[id])
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('admin',which='customers'))
+    if type == 'complaints':
+        cursor = mysql.connection.cursor()
+        cursor.execute('DELETE FROM complaints WHERE id = % s',[id])
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('admin',which='complaints'))
 # manually login
 @app.route('/login',methods=['POST','GET'])
 def login():
     if request.method == 'POST':
         mail = request.form['mail1']
         password = request.form['pwd1']
+        # login is admin or not
+        if mail == "admin" and password == 'admin@1810':
+            return redirect(url_for('admin',which='customers'))
         # check account is exists or not
         cursor = mysql.connection.cursor()
         cursor.execute('SELECT * FROM customerdeatils WHERE email=% s AND password=% s',(mail,password))
