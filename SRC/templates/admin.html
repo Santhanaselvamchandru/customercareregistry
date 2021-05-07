@@ -71,7 +71,7 @@
                 <h2>Complaints</h2>
             </div>
         </div>
-        <table>
+        <table id="table2">
             <thead>
                 <th>id</th>
                 <th>complaint name</th>
@@ -81,10 +81,12 @@
                 <th>Description</th>
                 <th>date</th>
                 <th>solved</th>
+                <th>AGENT ALLOT</th>
                 <th>Delete</th>
             </thead>
             <tbody>
                 {% for c in complaints %}
+                {% if c[7] == 0 %}
                 <tr>
                     <td>{{c[0]}}</td>
                     <td>{{c[1]}}</td>
@@ -92,10 +94,35 @@
                     <td>{{c[3]}}</td>
                     <td>{{c[4]}}</td>
                     <td>{{c[5]}}</td>
-                    <td>{{c[6]}}</td>
-                    <td>{{c[7]}}</td>
+                    <td>{{c[6]}}</td>                    
+                    <td>{{c[7]}}</td>                    
+                    <td>
+                        <form action="/solve_admin" method = "POST">
+                            <input type="text" name = "c_id" value="{{c[0]}}">
+                            <button type="submit">Alert</button>
+                        </form>
+                    </td>
                     <td><a href="/Delete/complaints/{{c[0]}}">Delete</a></td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td>{{c[0]}}</td>
+                    <td><del>{{c[1]}}</del></td>
+                    <td><del>{{c[2]}}</del></td>
+                    <td><del>{{c[3]}}</del></td>
+                    <td><del>{{c[4]}}</del></td>
+                    <td><del>{{c[5]}}</del></td>
+                    <td><del>{{c[6]}}</del></td>                    
+                    <td><del>{{c[7]}}</del></td>                    
+                    <td>
+                        <form action="/solve_admin" method = "POST">
+                            <input type="text" name = "c_id" value="{{c[0]}}">
+                            <button type="submit">Alert</button>
+                        </form>
+                    </td>
+                    <td><a href="/Delete/complaints/{{c[0]}}">Delete</a></td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>

@@ -111,3 +111,42 @@ body{
 .msg{
     color : green;
 }
+@media screen and (max-width : 600px){
+    body{
+        background : #fff;
+    }
+    .Tittle h1{
+        font-size : 1.2rem;
+    }
+    .urls div a{
+        color : var(--bgColor);
+        font-weight : bold;
+    }
+    .complaint_form{
+        margin-top : -0.5rem;
+        width : 30rem;
+        background-color : var(--bgColor);
+    }
+    .complaint_form form{
+        margin:0 auto;
+        padding : 0.5rem;
+    }
+    .complaint_form form div{
+        padding : 0.5rem;
+        display : flex;
+        flex-direction : column;
+        justify-content:center;
+        align-items : center;
+    }
+    .complaint_form form div h1{
+        color :var(--fontColor);
+        text-align :center;
+    }
+    .complaint_form form div input{
+        width : 25rem;
+    }
+    .complaint_form form div textarea{
+        width : 25rem;
+        height : 6rem;
+    }
+}

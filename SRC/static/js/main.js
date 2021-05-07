@@ -13,7 +13,6 @@ let left_content = document.querySelector('.signin');
 //sign in container go to invisible
 signin.addEventListener('click',()=>{
     left_container.style.backgroundColor = fontColor;
-    left_container.style.width = '130em';
     right_container.style.backgroundColor = bgColor;
     logo.style.fill = bgColor;
     logo_heading.style.color = bgColor;

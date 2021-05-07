@@ -1,25 +1,24 @@
 from flask import Flask,render_template,request,url_for,session,redirect
 from flask_mysqldb import MySQL
-from sendmail import sendemail
+from sendmail import sendemail,forget_password_mail,updated_password_mail,solve_mail
 from flask_oauthlib.client import OAuth
 import json
 import re
 from random import randint
 from datetime import date
 
-
 app = Flask(__name__)
 
 # database configuration
 app.config['MYSQL_HOST'] = 'remotemysql.com'
-app.config['MYSQL_USER'] = 'a7tPSqJMm4'
-app.config['MYSQL_PASSWORD'] = 'dZRSGZReBY'
-app.config['MYSQL_DB'] = 'a7tPSqJMm4'
+app.config['MYSQL_USER'] = 'DB USERNAME'
+app.config['MYSQL_PASSWORD'] = 'DB PASSWORD'
+app.config['MYSQL_DB'] = 'DB NAME'
 mysql = MySQL(app)
 
 # Google authenticate configuration
-app.config['GOOGLE_ID'] = 'Your google id'
-app.config['GOOGLE_SECRET'] = 'Your Google Secret Key'
+app.config['GOOGLE_ID'] = 'GOOGLE API ID'
+app.config['GOOGLE_SECRET'] = 'GOOGLE SECRET KEY'
 
 app.secret_key = "customercareregistry"
 
@@ -76,15 +75,13 @@ def register():
         if existing_user:
             msg = 'Account already exists please login.'
             return render_template('index.html',signupmsg = msg)
-        #not exists
+        # not exists
+        # send mail
+        sendemail(mail,'Account_creation')
         cursor = mysql.connection.cursor()
         cursor.execute('INSERT INTO customerdeatils VALUES(null,% s,% s,% s)',(name,mail,pwd))
         mysql.connection.commit()
         cursor.close()
-        subject = 'Customer care registry account creation.'
-        text = 'Account creation successfully.'
-        # send mail
-        sendemail(mail,subject,text)
         msg = 'Your registration successfully completed.'
     return render_template('index.html',signupmsg = msg)
 # admin page
@@ -176,10 +173,8 @@ def google_signup_authorized():
         cursor.execute('INSERT INTO customerdeatils VALUES(null,% s,% s,% s)',(name,mail,password))
         mysql.connection.commit()
         cursor.close()
-        subject = 'Customer care registry account creation.'
-        text = 'Account creation successfully.'
         # send mail
-        sendemail(mail,subject,text)
+        sendemail(mail,'Account_creation')
         msg = 'Your registration successfully completed. password is {} please go to login'.format(str(password))
         return render_template('index.html',signupmsg = msg)
     else:
@@ -242,9 +237,13 @@ def complaint():
         date = request.form["date"]
         des = request.form['complaint_des']
         cursor = mysql.connection.cursor()
+        if not name == session["username"] or not mail == session["mail"]:
+            msg = "please don't change username and mail."
+            return render_template('home.html',msg=msg)
         cursor.execute("INSERT INTO complaints VALUES(NULL,% s,% s,% s,% s,% s,% s,% s)",(complaint_name,name,mail,against_person,des,date,'0'))
         mysql.connection.commit()
         cursor.close()
+        sendemail(mail,'complaint_creation')
         msg = 'Complaint registerd you check out complaints section.'
         return render_template('home.html',msg=msg)
 
@@ -252,11 +251,11 @@ def complaint():
 @app.route('/showcomplaints')
 def showcomplaints():
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM complaints WHERE username= % s",(session["username"],))
+    cursor.execute("SELECT * FROM complaints WHERE username= % s AND email=% s",(session["username"],session["mail"]))
     details = cursor.fetchall()
     cursor.close()
     return render_template('complaints.html',complaints=details)
-
+# update complaint
 @app.route('/solve',methods=["POST"])
 def solve_complaint():
     if request.method == "POST":
@@ -264,10 +263,25 @@ def solve_complaint():
         cursor = mysql.connection.cursor()
         cursor.execute("UPDATE complaints SET solved = % s WHERE id = % s",('1',c_id,))
         mysql.connection.commit()
+        cursor.execute("SELECT * FROM complaints WHERE id = % s",[c_id])
+        details = cursor.fetchone()
         cursor.close()
+        solve_mail(details[3],'user')
         return redirect(url_for('showcomplaints'))
     return redirect(url_for('showcomplaints'))
-
+# admin agent allot
+@app.route('/solve_admin',methods=["POST"])
+def solve_admin():
+    if request.method == "POST":
+        c_id = request.form['c_id']
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM complaints WHERE id = % s",[c_id])
+        details = cursor.fetchone()
+        cursor.close()
+        solve_mail(details[3],'admin')
+        return redirect(url_for('admin',which='complaints'))
+    return redirect(url_for('admin',which='complaints'))
+# remove complaint
 @app.route('/dismiss',methods=["POST"])
 def dismiss_complaint():
     if request.method == "POST":
@@ -278,12 +292,46 @@ def dismiss_complaint():
         cursor.close()
         return redirect(url_for('showcomplaints'))
     return redirect(url_for('showcomplaints'))
+# send otp in user mail id
+@app.route('/send_otp',methods=["POST","GET"])
+def send_otp():
+    if request.method == "POST":
+        mail = request.form["mail"]
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM customerdeatils WHERE email = % s",[mail])
+        temp = cursor.fetchone()
+        cursor.close()
+        if not temp:
+            return render_template('forget.html',type='otp',msg1='Your account doesn\'t exist please register')
+        otp = randint(10 ** 5,10**6)
+        forget_password_mail(mail,otp)
+        session["otp"] = otp
+        return render_template('forget.html',type='update_password',tempmail=mail)
+# forget password method      
+@app.route('/forgetpassword/<type>',methods=["POST","GET"])
+def forgetpassword(type):
+    if type == 'otp':
+        return render_template('forget.html',type=type)
+    if request.method == "POST":
+        mail = request.form["mail"]
+        otp = request.form["otp"]
+        pwd = request.form["password"]
+        c_pwd = request.form["con_pwd"]
+        print(otp,session['otp'])
+        if not pwd == c_pwd:
+            msg = 'Please Enter Password properly'
+            return render_template('forget.html',type='updatePassword',msg=msg)
+        if not otp == str(session['otp']):
+            msg = "Your OTP is Incorrect."
+            return render_template('forget.html',type='updatePassword',msg=msg)
+        cursor = mysql.connection.cursor()
+        cursor.execute("UPDATE customerdeatils SET password = % s WHERE email = % s",(pwd,mail))
+        mysql.connection.commit()
+        cursor.close()
+        msg = 'password updated successfully'
+        updated_password_mail(mail)
+        return render_template('forget.html',type='updatePassword',msg=msg)
 
-# feedback
-@app.route('/feedback')
-def feedback():
-    return render_template('feedback.html')
-
-
+        
 if __name__ == '__main__':
     app.run(host = '0.0.0.0',port = 8080,debug=True)

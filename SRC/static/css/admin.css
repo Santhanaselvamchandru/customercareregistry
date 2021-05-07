@@ -63,6 +63,14 @@ body{
 }
 table{
     margin : 0 auto;
+    width : 60rem;
+    border-collapse : separate;
+    border-spacing : 0 0.1rem;
+    text-align : center;
+    margin-bottom : 2rem;
+}
+#table2{
+    margin : 0 auto;
     width : 83rem;
     border-collapse : separate;
     border-spacing : 0 0.1rem;
@@ -71,7 +79,7 @@ table{
 }
 table thead th{
     padding : 0.8rem;
-    font-size : 1.2rem;
+    font-size : 1rem;
     text-transform : uppercase;
     color : var(--bgColor);
     background-color : var(--fontColor);
@@ -83,9 +91,12 @@ table tbody tr:nth-child(even){
     background-color : var(--fontColor);
 }
 table tbody tr td{
-    padding : 1rem 0;
+    padding : 1rem 0.5rem;
     color : #2d3436;
-    font-size : 1.2rem;
+    font-size : 1rem;
+}
+table tbody tr .unsucccess{
+    color : red;
 }
 td a{
     text-decoration : none;
@@ -94,4 +105,15 @@ td a{
     padding : 0.7rem 0.9rem;
     border-radius : 3px;
     font-size : 0.9rem;
+}
+td form input{
+    display : none;
+}
+td form button{
+    color : #fff;
+    background-color : rgb(238, 204, 9);
+    padding : 0.6rem 0.8rem;
+    border-radius : 3px;
+    font-size : 0.9rem;
+    border : 1px solid rgb(238, 204, 9);
 }

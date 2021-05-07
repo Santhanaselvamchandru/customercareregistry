@@ -156,3 +156,19 @@ input[type="text"] {
 .fa-spinner{
     transform : rotate(40deg);
 }
+@media screen and (max-width : 600px){
+    .Tittle h1{
+        font-size : 1.3rem;
+    }
+    .complaints_list{
+        grid-template-columns : repeat(1,1fr);
+    }
+    .complaint{
+        margin-left : 2.5rem;
+    }
+    .no_com{
+        width : 30rem;
+        font-size : 0.8rem;
+        text-align : center;
+    }
+}
